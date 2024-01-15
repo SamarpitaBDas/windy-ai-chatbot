@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+</head>
+<body>
+    <div class="grid-container">
+        <div class="grid-item">
+            <div class="profile-container">
+                <img class="profile-pic" src="pfp.jpg" alt="Profile Picture">
+                <div class="profile-name">windy</div>
+            </div>
+            <div class="chat-container">
+                <div class="chat-box" id="chatBox">
+                </div>
+                <div class="input-container">
+                    <input class="inputmsg" type="text" id="userInput" placeholder="Type a message..." onkeypress="sendMessage(event)">
+                    <button class="send-button" id="sendButton"onclick="sendMessage()">
+                        <img class="pfp" src="send.png"  alt="send">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script >
+        async function getOpenAIResponse(userInput) {
+            const apiKey = '//open-ai-api-key'; 
+            const endpoint = 'YOUR_OPENAI_API_ENDPOINT'; 
+        
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    prompt: userInput,
+                    max_tokens: 100
+                })
+            });
+        
+            const data = await response.json();
+            return data.choices[0]?.text.trim();
+        }
+        
+        function appendMessage(sender, message) {
+            const chatBox = document.getElementById('chatBox');
+            
+            // Create a message container
+            const messageContainer = document.createElement('div');
+        
+            // Apply styles based on the sender
+            if (sender === 'Bot') {
+                messageContainer.className = 'ai-msg';
+            } else if (sender === 'You') {
+                messageContainer.className = 'user-msg';
+            }
+        
+            // Add the message content
+            messageContainer.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        
+            // Append the message container to the chat box
+            chatBox.appendChild(messageContainer);
+        
+            // Scroll to the bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        
+        async function sendMessage(event) {
+            if (event && event.type === 'keypress' && event.key !== 'Enter') {
+                return;
+            }
+        
+            const userInput = document.getElementById('userInput').value;
+            appendMessage(userInput);
+        
+            try {
+                const aiResponse = await getOpenAIResponse(userInput);
+                appendMessage( aiResponse);
+            } catch (error) {
+                console.error('Error:', error);
+                appendMessage('Sorry, an error occurred.');
+            }
+        
+            document.getElementById('userInput').value = '';
+        }
+        
+
+    </script>
+</body>
+</html>
