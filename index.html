@@ -48,24 +48,15 @@
         
         function appendMessage(sender, message) {
             const chatBox = document.getElementById('chatBox');
-            
-            // Create a message container
             const messageContainer = document.createElement('div');
-        
-            // Apply styles based on the sender
             if (sender === 'Bot') {
                 messageContainer.className = 'ai-msg';
             } else if (sender === 'You') {
                 messageContainer.className = 'user-msg';
             }
-        
-            // Add the message content
             messageContainer.innerHTML = `<strong>${sender}:</strong> ${message}`;
-        
-            // Append the message container to the chat box
             chatBox.appendChild(messageContainer);
         
-            // Scroll to the bottom
             chatBox.scrollTop = chatBox.scrollHeight;
         }
         
@@ -75,18 +66,18 @@
             }
         
             const userInput = document.getElementById('userInput').value;
-            appendMessage(userInput);
+            appendMessage('You', userInput);
         
             try {
                 const aiResponse = await getOpenAIResponse(userInput);
-                appendMessage( aiResponse);
+                appendMessage('Bot', aiResponse);
             } catch (error) {
                 console.error('Error:', error);
-                appendMessage('Sorry, an error occurred.');
+                appendMessage('Bot', 'Sorry, an error occurred.');
             }
         
             document.getElementById('userInput').value = '';
-        }
+        }        
         
 
     </script>
